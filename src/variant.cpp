@@ -148,6 +148,10 @@ namespace {
         v->startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1";
         v->castling = false;
         v->doubleStep = false;
+        // Without the double step no en passant square can arise in play, but an
+        // imported FEN may still carry one. Emptying the region makes such a
+        // setup be ignored instead of allowing a capture the rules do not have.
+        v->enPassantRegion[WHITE] = v->enPassantRegion[BLACK] = 0;
         v->sparkRule = true;
         v->extinctionValue = -VALUE_MATE;
         v->extinctionPieceTypes = piece_set(COMMONER);

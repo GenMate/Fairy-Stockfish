@@ -137,6 +137,21 @@ class SparkChessTest(unittest.TestCase):
                 self.assertNotIn("e1g1", moves)
                 self.assertNotIn("e1c1", moves)
 
+    def test_imported_en_passant_square_is_ignored(self):
+        # Reported from an imported classical game. The FEN carries the en
+        # passant square g3, but Spark Chess has no double pawn step and so no
+        # en passant capture; f4g3 must be absent. Ordinary chess in the same
+        # build still offers it, which is what keeps this check honest.
+        board = "q3b1k1/1p6/2p1p2p/2PpP1pn/1P1P1pP1/3B1P2/4NK1P/1Q6"
+        fen = board + " b - g3 0 32"
+        plain = board + " b - - 0 32"
+        self.assertEqual(sf.validate_fen(fen, self.variant), sf.FEN_OK)
+        self.assertEqual(sf.get_fen(self.variant, fen, []), plain)
+        moves = self.moves(fen)
+        self.assertNotIn("f4g3", moves)
+        self.assertEqual(moves, self.moves(plain))
+        self.assertIn("f4g3", sf.legal_moves("chess", fen, []))
+
     def test_no_legal_moves_is_a_draw(self):
         fen = "BBBBBBBB/PPPPPPPP/PP6/PP6/PP6/PP6/PP6/KP5k w - - 0 1"
         self.assertEqual(sf.validate_fen(fen, self.variant), sf.FEN_OK)
